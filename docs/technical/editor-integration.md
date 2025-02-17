@@ -286,6 +286,7 @@ These editors are currently supported:
  - [Pulsar](https://pulsar-edit.dev/)
  - [Cursor](https://www.cursor.com/)
  - [Zed](https://zed.dev/)
+ - [Windsurf](https://codeium.com/windsurf)
 
 These are defined in a list at the top of the file:
 
