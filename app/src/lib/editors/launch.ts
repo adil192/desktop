@@ -1,5 +1,5 @@
-import { spawn, SpawnOptions } from 'child_process'
-import { pathExists } from '../../ui/lib/path-exists'
+import { ChildProcess, SpawnOptionsWithoutStdio } from 'child_process'
+import { pathExists, spawn, spawnEditor } from '../helpers/linux'
 import { ExternalEditorError, FoundEditor } from './shared'
 import {
   expandTargetPathArgument,
@@ -11,7 +11,8 @@ async function launchEditor(
   editorPath: string,
   args: readonly string[],
   editorName: string,
-  spawnAsDarwinApp: boolean
+  spawnAsDarwinApp: boolean,
+  spawnAsLinuxApp: boolean,
 ) {
   const exists = await pathExists(editorPath)
   const label = __DARWIN__ ? 'Settings' : 'Options'
@@ -23,17 +24,21 @@ async function launchEditor(
   }
 
   return new Promise<void>((resolve, reject) => {
-    const opts: SpawnOptions = {
+    const opts: SpawnOptionsWithoutStdio = {
       // Make sure the editor processes are detached from the Desktop app.
       // Otherwise, some editors (like Notepad++) will be killed when the
       // Desktop app is closed.
       detached: true,
-      stdio: 'ignore',
     }
 
-    const child = spawnAsDarwinApp
-      ? spawn('open', ['-a', editorPath, ...args], opts)
-      : spawn(editorPath, args, opts)
+    let child: ChildProcess;
+    if (spawnAsDarwinApp) {
+      child = spawn('open', ['-a', editorPath, ...args], opts);
+    } else if (spawnAsLinuxApp) {
+      child = spawnEditor(editorPath, args[0], opts)
+    } else {
+      child = spawn(editorPath, args, opts)
+    }
 
     child.on('error', reject)
     child.on('spawn', resolve)
@@ -59,7 +64,7 @@ async function launchEditor(
  * @param editor The external editor to launch.
  */
 export const launchExternalEditor = (fullPath: string, editor: FoundEditor) =>
-  launchEditor(editor.path, [fullPath], `'${editor.editor}'`, __DARWIN__)
+  launchEditor(editor.path, [fullPath], `'${editor.editor}'`, __DARWIN__, __LINUX__)
 
 /**
  * Open a given file or folder in the desired custom external editor.
@@ -82,5 +87,5 @@ export const launchCustomExternalEditor = (
   const spawnAsDarwinApp = __DARWIN__ && customEditor.bundleID !== undefined
   const editorName = `custom editor at path '${customEditor.path}'`
 
-  return launchEditor(customEditor.path, args, editorName, spawnAsDarwinApp)
+  return launchEditor(customEditor.path, args, editorName, spawnAsDarwinApp, __LINUX__)
 }

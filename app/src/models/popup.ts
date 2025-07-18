@@ -103,6 +103,7 @@ export enum PopupType {
   BypassPushProtection = 'BypassPushProtection',
   GenerateCommitMessageOverrideWarning = 'GenerateCommitMessageOverrideWarning',
   GenerateCommitMessageDisclaimer = 'GenerateCommitMessageDisclaimer',
+  ConfirmRestart = 'ConfirmRestart',
 }
 
 interface IBasePopup {
@@ -464,5 +465,6 @@ export type PopupDetail =
       repository: Repository
       filesSelected: ReadonlyArray<WorkingDirectoryFileChange>
     }
+  | { type: PopupType.ConfirmRestart }
 
 export type Popup = IBasePopup & PopupDetail
