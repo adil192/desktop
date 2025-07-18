@@ -12,7 +12,7 @@ async function launchEditor(
   args: readonly string[],
   editorName: string,
   spawnAsDarwinApp: boolean,
-  spawnAsLinuxApp: boolean,
+  spawnAsLinuxApp: boolean
 ) {
   const exists = await pathExists(editorPath)
   const label = __DARWIN__ ? 'Settings' : 'Options'
@@ -31,9 +31,9 @@ async function launchEditor(
       detached: true,
     }
 
-    let child: ChildProcess;
+    let child: ChildProcess
     if (spawnAsDarwinApp) {
-      child = spawn('open', ['-a', editorPath, ...args], opts);
+      child = spawn('open', ['-a', editorPath, ...args], opts)
     } else if (spawnAsLinuxApp) {
       child = spawnEditor(editorPath, args[0], opts)
     } else {
@@ -64,7 +64,13 @@ async function launchEditor(
  * @param editor The external editor to launch.
  */
 export const launchExternalEditor = (fullPath: string, editor: FoundEditor) =>
-  launchEditor(editor.path, [fullPath], `'${editor.editor}'`, __DARWIN__, __LINUX__)
+  launchEditor(
+    editor.path,
+    [fullPath],
+    `'${editor.editor}'`,
+    __DARWIN__,
+    __LINUX__
+  )
 
 /**
  * Open a given file or folder in the desired custom external editor.
@@ -87,5 +93,11 @@ export const launchCustomExternalEditor = (
   const spawnAsDarwinApp = __DARWIN__ && customEditor.bundleID !== undefined
   const editorName = `custom editor at path '${customEditor.path}'`
 
-  return launchEditor(customEditor.path, args, editorName, spawnAsDarwinApp, __LINUX__)
+  return launchEditor(
+    customEditor.path,
+    args,
+    editorName,
+    spawnAsDarwinApp,
+    __LINUX__
+  )
 }
