@@ -335,6 +335,13 @@ function setAsDefaultProtocolClient(protocol: string) {
   }
 }
 
+if (__LINUX__) {
+  // Set GTK version to 3 on Linux to avoid GTK 2/3 and GTK 4 conflicts
+  // https://www.electronjs.org/docs/latest/breaking-changes#changed-gtk-4-is-default-when-running-gnome
+  log.debug('Setting GTK version to 3 to avoid GTK 2/3 and GTK 4 conflicts')
+  app.commandLine.appendSwitch('gtk-version', '3')
+}
+
 if (process.env.GITHUB_DESKTOP_DISABLE_HARDWARE_ACCELERATION) {
   log.info(
     `GITHUB_DESKTOP_DISABLE_HARDWARE_ACCELERATION environment variable set, disabling hardware acceleration`
